@@ -9,18 +9,22 @@ import {BrowserWindow} from 'electron';
  * See https://github.com/vitest-dev/vitest/issues/1730
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MockedClass<T extends Constructable> = MockInstance<T extends new (...args: infer P) => any ? P : never, InstanceType<T>> & {
+type MockedClass<T extends Constructable> = MockInstance<
+  T extends new (...args: infer P) => any ? P : never,
+  InstanceType<T>
+> & {
   prototype: T extends {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      prototype: any;
-  } ? Mocked<T['prototype']> : never;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    prototype: any;
+  }
+    ? Mocked<T['prototype']>
+    : never;
 } & T;
 
 /**
  * Mock real electron BrowserWindow API
  */
 vi.mock('electron', () => {
-
   // Use "as unknown as" because vi.fn() does not have static methods
   const bw = vi.fn() as unknown as MockedClass<typeof BrowserWindow>;
   bw.getAllWindows = vi.fn(() => bw.mock.instances);
@@ -37,11 +41,9 @@ vi.mock('electron', () => {
   return {BrowserWindow: bw};
 });
 
-
 beforeEach(() => {
   vi.clearAllMocks();
 });
-
 
 test('Should create a new window', async () => {
   const {mock} = vi.mocked(BrowserWindow);
@@ -52,7 +54,6 @@ test('Should create a new window', async () => {
   expect(mock.instances[0].loadURL).toHaveBeenCalledOnce();
   expect(mock.instances[0].loadURL).toHaveBeenCalledWith(expect.stringMatching(/index\.html$/));
 });
-
 
 test('Should restore an existing window', async () => {
   const {mock} = vi.mocked(BrowserWindow);
@@ -67,7 +68,6 @@ test('Should restore an existing window', async () => {
   expect(mock.instances).toHaveLength(1);
   expect(appWindow.restore).toHaveBeenCalledOnce();
 });
-
 
 test('Should create a new window if the previous one was destroyed', async () => {
   const {mock} = vi.mocked(BrowserWindow);

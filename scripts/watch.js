@@ -4,14 +4,11 @@ const {createServer, build, createLogger} = require('vite');
 const electronPath = require('electron');
 const {spawn} = require('child_process');
 
-
 /** @type 'production' | 'development'' */
-const mode = process.env.MODE = process.env.MODE || 'development';
-
+const mode = (process.env.MODE = process.env.MODE || 'development');
 
 /** @type {import('vite').LogLevel} */
 const logLevel = 'info';
-
 
 /** Messages on stderr that match any of the contained patterns will be stripped from output */
 const stderrFilterPatterns = [
@@ -22,7 +19,6 @@ const stderrFilterPatterns = [
    */
   /ExtensionLoadWarning/,
 ];
-
 
 /**
  * Setup watcher for `main` package
@@ -51,39 +47,42 @@ const setupMainPackageWatcher = ({resolvedUrls}) => {
       watch: {},
     },
     configFile: 'packages/main/vite.config.js',
-    plugins: [{
-      name: 'reload-app-on-main-package-change',
-      writeBundle() {
-        /** Kill electron ff process already exist */
-        if (spawnProcess !== null) {
-          spawnProcess.off('exit', process.exit);
-          spawnProcess.kill('SIGINT');
-          spawnProcess = null;
-        }
+    plugins: [
+      {
+        name: 'reload-app-on-main-package-change',
+        writeBundle() {
+          /** Kill electron ff process already exist */
+          if (spawnProcess !== null) {
+            spawnProcess.off('exit', process.exit);
+            spawnProcess.kill('SIGINT');
+            spawnProcess = null;
+          }
 
-        /** Spawn new electron process */
-        spawnProcess = spawn(String(electronPath), ['.']);
+          /** Spawn new electron process */
+          spawnProcess = spawn(String(electronPath), ['.']);
 
-        /** Proxy all logs */
-        spawnProcess.stdout.on('data', d => d.toString().trim() && logger.warn(d.toString(), {timestamp: true}));
+          /** Proxy all logs */
+          spawnProcess.stdout.on(
+            'data',
+            d => d.toString().trim() && logger.warn(d.toString(), {timestamp: true}),
+          );
 
-        /** Proxy error logs but stripe some noisy messages. See {@link stderrFilterPatterns} */
-        spawnProcess.stderr.on('data', d => {
-          const data = d.toString().trim();
-          if (!data) return;
-          const mayIgnore = stderrFilterPatterns.some((r) => r.test(data));
-          if (mayIgnore) return;
-          logger.error(data, {timestamp: true});
-        });
+          /** Proxy error logs but stripe some noisy messages. See {@link stderrFilterPatterns} */
+          spawnProcess.stderr.on('data', d => {
+            const data = d.toString().trim();
+            if (!data) return;
+            const mayIgnore = stderrFilterPatterns.some(r => r.test(data));
+            if (mayIgnore) return;
+            logger.error(data, {timestamp: true});
+          });
 
-        /** Stops the watch script when the application has been quit */
-        spawnProcess.on('exit', process.exit);
+          /** Stops the watch script when the application has been quit */
+          spawnProcess.on('exit', process.exit);
+        },
       },
-    }],
+    ],
   });
-
 };
-
 
 /**
  * Setup watcher for `preload` package
@@ -103,20 +102,20 @@ const setupPreloadPackageWatcher = ({ws}) =>
       watch: {},
     },
     configFile: 'packages/preload/vite.config.js',
-    plugins: [{
-      name: 'reload-page-on-preload-package-change',
-      writeBundle() {
-        ws.send({
-          type: 'full-reload',
-        });
+    plugins: [
+      {
+        name: 'reload-page-on-preload-package-change',
+        writeBundle() {
+          ws.send({
+            type: 'full-reload',
+          });
+        },
       },
-    }],
+    ],
   });
-
 
 (async () => {
   try {
-
     /**
      * Renderer watcher
      * This must be the first,

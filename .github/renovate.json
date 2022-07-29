@@ -11,29 +11,20 @@
     ":label(dependencies)",
     "schedule:weekly"
   ],
-  "baseBranches": [
-    "main"
-  ],
+  "baseBranches": ["main"],
   "bumpVersion": "patch",
 
   "packageRules": [
     {
-      "packageNames": [
-        "node",
-        "npm"
-      ],
+      "packageNames": ["node", "npm"],
       "enabled": false
     },
     {
-      "depTypeList": [
-        "devDependencies"
-      ],
+      "depTypeList": ["devDependencies"],
       "semanticCommitType": "build"
     },
     {
-      "matchPackageNames": [
-        "electron"
-      ],
+      "matchPackageNames": ["electron"],
       "separateMajorMinor": false
     }
   ]
