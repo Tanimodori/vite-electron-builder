@@ -1,6 +1,7 @@
 import {app, BrowserWindow} from 'electron';
 import {join} from 'node:path';
 import {URL} from 'node:url';
+import axios from 'axios';
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -28,6 +29,15 @@ async function createWindow() {
     if (import.meta.env.DEV) {
       browserWindow?.webContents.openDevTools();
     }
+
+    axios
+      .get('https://github.com')
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   });
 
   /**
