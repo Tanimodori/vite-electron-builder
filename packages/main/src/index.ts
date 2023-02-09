@@ -3,9 +3,6 @@ import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
 import {platform} from 'node:process';
 
-import {OPCUAClient} from 'node-opcua-client';
-console.log(OPCUAClient);
-
 /**
  * Prevent electron from running multiple instances.
  */
