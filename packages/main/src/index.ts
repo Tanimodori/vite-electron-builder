@@ -3,6 +3,9 @@ import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
 import {platform} from 'node:process';
 
+import {OPCUAClient} from 'node-opcua-client';
+console.log(OPCUAClient);
+
 /**
  * Prevent electron from running multiple instances.
  */
@@ -72,7 +75,7 @@ if (import.meta.env.PROD) {
       const autoUpdater =
         module.autoUpdater ||
         // @ts-expect-error Hotfix for https://github.com/electron-userland/electron-builder/issues/7338
-        (module.default.autoUpdater as (typeof module)['autoUpdater']);
+        (module.default.autoUpdater as typeof module['autoUpdater']);
       return autoUpdater.checkForUpdatesAndNotify();
     })
     .catch(e => console.error('Failed check and install updates:', e));
