@@ -45,6 +45,9 @@ const config = {
         return externalNames.includes(name);
       },
     },
+    commonjsOptions: {
+      ignoreDynamicRequires: true,
+    },
     emptyOutDir: true,
     reportCompressedSize: false,
   },
