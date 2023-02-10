@@ -32,7 +32,7 @@ const config = {
       output: {
         exports: 'named',
         preserveModules: true,
-        preserveModulesRoot: 'packages/preload/src',
+        preserveModulesRoot: join(PACKAGE_ROOT, 'src'),
         entryFileNames: info => `${info.name}.cjs`,
       },
       external: src => {
