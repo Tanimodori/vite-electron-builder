@@ -4,6 +4,7 @@ import {join} from 'node:path';
 import {injectAppVersion} from '../../version/inject-app-version-plugin.mjs';
 import nodeBuiltins from 'builtin-modules/static';
 import electronBuiltins from 'electron-builtins';
+import {viteStaticCopy} from 'vite-plugin-static-copy';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
@@ -29,7 +30,10 @@ const config = {
     },
     rollupOptions: {
       output: {
-        entryFileNames: '[name].cjs',
+        exports: 'named',
+        preserveModules: true,
+        preserveModulesRoot: 'packages/preload/src',
+        entryFileNames: info => `${info.name}.cjs`,
       },
       external: src => {
         const [name] = src.split('/');
@@ -47,7 +51,19 @@ const config = {
   ssr: {
     noExternal: true,
   },
-  plugins: [preload.vite(), injectAppVersion()],
+  plugins: [
+    preload.vite(),
+    injectAppVersion(),
+    viteStaticCopy({
+      flatten: false,
+      targets: [
+        {
+          src: ['../../node_modules/usb/prebuilds/**'],
+          dest: 'dist',
+        },
+      ],
+    }),
+  ],
 };
 
 export default config;
