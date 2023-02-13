@@ -28,8 +28,16 @@ const config = {
       formats: ['cjs'],
     },
     rollupOptions: {
+      /**
+       * Workaround for vitejs/vite#12012
+       * See https://github.com/vitejs/vite/issues/12012
+       */
+      preserveEntrySignatures: 'strict',
       output: {
-        entryFileNames: '[name].cjs',
+        exports: 'named',
+        preserveModules: true,
+        preserveModulesRoot: join(PACKAGE_ROOT, 'src'),
+        entryFileNames: info => `${info.name}.cjs`,
       },
       external: src => {
         const [name] = src.split('/');
@@ -40,6 +48,9 @@ const config = {
         ];
         return externalNames.includes(name);
       },
+    },
+    commonjsOptions: {
+      ignoreDynamicRequires: true,
     },
     emptyOutDir: true,
     reportCompressedSize: false,
